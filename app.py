@@ -1,83 +1,90 @@
 import streamlit as st
 import random
-import webbrowser
 
-# --- CONFIGURATION ---
-st.set_page_config(page_title="EchoBreak", page_icon="🌊", layout="wide")
+# --- MOBILE-FIRST CONFIG ---
+st.set_page_config(
+    page_title="EchoBreak", 
+    page_icon="🌊", 
+    layout="centered"  # Centers content for narrow screens
+)
 
-# --- CUSTOM CSS ---
+# --- MOBILE UI STYLING ---
 st.markdown("""
     <style>
-    .main { background-color: #f0f2f6; }
-    .stButton>button { width: 100%; border-radius: 20px; height: 3em; background-color: #4CAF50; color: white; }
-    .break-text { font-size: 1.2rem; color: #555; font-style: italic; }
+    /* Remove unnecessary padding on mobile */
+    .block-container { padding-top: 2rem; padding-bottom: 2rem; }
+    
+    /* Make buttons huge and thumb-friendly */
+    .stButton>button {
+        width: 100%;
+        height: 80px;
+        font-size: 1.5rem !important;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        margin-top: 10px;
+    }
+    
+    /* Style the platform selector to look like tabs */
+    .stRadio div[role="radiogroup"] {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    
+    /* Center text for that app feel */
+    .main-header { text-align: center; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- APP HEADER ---
-st.title("🌊 EchoBreak")
-st.subheader("Escape the echo chamber. Explore the unexplored.")
+# --- HEADER ---
+st.markdown("<h1 class='main-header'>🌊 EchoBreak</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; opacity: 0.8;'>Anti-Algorithm Layer</p>", unsafe_allow_html=True)
 
-# --- SIDEBAR: SETTINGS ---
-with st.sidebar:
-    st.header("Exploration Mode")
-    platform = st.radio("Select Platform:", ["YouTube", "Instagram"])
-    intensity = st.slider("Anti-Algorithm Intensity", 1, 10, 5)
-    st.info("Higher intensity picks keywords further from your typical search history.")
+# --- PLATFORM PICKER ---
+# Using a horizontal radio layout for a "tab" feel on mobile
+platform = st.radio("Target App:", ["YouTube", "Instagram"], horizontal=True)
 
-# --- CORE LOGIC ---
-keywords = [
-    "Permaculture", "Stoicism", "Deep Sea Exploration", "Modular Synthesizers", 
-    "Urban Planning", "Microscopy", "Linguistics", "Brutalist Architecture", 
-    "Artisan Blacksmithing", "Quantum Computing", "Ancient Navigation"
-]
+st.divider()
 
+# --- CONTENT GENERATOR ---
+keywords = ["Liminal Spaces", "Biohacking", "Found Footage", "Solarpunk", "Theremin Music", "Permaculture"]
 perspectives = {
-    "The Skeptic": "critique of",
-    "The Artist": "aesthetic and visual",
-    "The Scientist": "data and mechanics of",
-    "The Historian": "origins and evolution of"
+    "🧠 The Scientist": "mechanics of",
+    "🎨 The Artist": "aesthetic of",
+    "📜 The Historian": "history of",
+    "🔮 The Futurist": "future of"
 }
 
-# --- MAIN INTERFACE ---
-col1, col2 = st.columns([2, 1])
+st.write("### 1. Choose your lens")
+viewpoint = st.selectbox("", list(perspectives.keys()))
 
-with col1:
-    st.markdown("### 🎲 Break the Loop")
-    st.write("Click below to generate a search query that exists outside your usual bubble.")
+st.write("### 2. Break the cycle")
+if st.button("🚀 GENERATE EXPLORATION"):
+    topic = random.choice(keywords)
+    prefix = perspectives[viewpoint]
+    query = f"{prefix} {topic}"
     
-    selected_perspective = st.selectbox("View the world as:", list(perspectives.keys()))
+    # Visual Feedback for Mobile
+    st.info(f"Seeking: **{query}**")
     
-    if st.button("Generate New Horizon"):
-        random_topic = random.choice(keywords)
-        prefix = perspectives[selected_perspective]
-        final_query = f"{prefix} {random_topic}"
-        
-        st.success(f"**Your Mission:** Explore **{final_query}**")
-        
-        # Construct Search URLs
-        if platform == "YouTube":
-            url = f"https://www.youtube.com/results?search_query={final_query.replace(' ', '+')}"
-        else:
-            url = f"https://www.instagram.com/explore/tags/{random_topic.replace(' ', '')}/"
-        
-        st.markdown(f"### [Click to Open {platform} 🚀]({url})")
-        st.caption("Pro-tip: Don't look at the 'Suggested' sidebar. Stay on mission.")
+    if platform == "YouTube":
+        url = f"https://m.youtube.com/results?search_query={query.replace(' ', '+')}"
+    else:
+        url = f"https://www.instagram.com/explore/tags/{topic.replace(' ', '')}/"
+    
+    # Use a big link button for mobile tapping
+    st.markdown(f"""
+        <a href="{url}" target="_blank">
+            <div style="background-color:#FF4B4B; color:white; padding:20px; text-align:center; border-radius:15px; font-weight:bold; text-decoration:none; font-size:1.2rem;">
+                OPEN {platform.upper()} NOW
+            </div>
+        </a>
+    """, unsafe_allow_html=True)
 
-with col2:
-    st.markdown("### 🧘 Daily Deep Dive")
-    st.info("The algorithm wants you to scroll. EchoBreak wants you to focus.")
-    
-    st.write("**Today's Deep Dive Topic:**")
-    st.code("The impact of 17th-century cartography on modern borders.")
-    
-    if st.checkbox("I commit to 10 minutes of reading/watching this."):
-        st.balloons()
-        st.write("Focus mode activated. See you in 10 minutes.")
-
-# --- FOOTER ---
+# --- DAILY CHALLENGE ---
 st.divider()
-st.markdown(
-    "<div class='break-text'>'The algorithm knows what you liked yesterday. EchoBreak knows you might like something different today.'</div>", 
-    unsafe_allow_html=True
-)
+with st.expander("🎯 Today's Focus Challenge"):
+    st.write("Watch one video over 15 minutes long without checking your notifications.")
+    if st.button("Challenge Accepted"):
+        st.balloons()
